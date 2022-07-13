@@ -1,10 +1,47 @@
 import { ThumbsUp, Trash } from 'phosphor-react';
+import { format, formatDistanceToNow } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+
+import { Avatar } from './Avatar';
+
 import styles from './Comment.module.css';
 
-export const Comment = () => {
+export const Comment = ({
+  onDelete,
+  content = [],
+  publishedAt = new Date()
+}) => {
+  const publishedFormattedDate = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", {
+    locale: ptBR
+  });
+
+  const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {
+    locale: ptBR,
+  });
+
+  const getCommentContent = () => {
+    if (content.type === 'paragraph') {
+      return (
+        <p>{content.message}</p>
+      )
+    }
+
+    if (content.type === 'link') {
+      return (
+        <a href="#">{content.message}</a>
+      )
+    }
+
+    return <p>{content.message}</p>
+  }
+
   return (
     <div className={styles.comment}>
-      <img className={styles.avatar} src="https://github.com/thlindustries.png" />
+      <Avatar
+        avatarUrl='https://github.com/thlindustries.png'
+        noBorder
+        customStyles={{ width: '3rem', height: '3rem' }}
+      />
 
       <div className={styles.commentBox}>
         <div className={styles.commentContent}>
@@ -12,20 +49,19 @@ export const Comment = () => {
             <div className={styles.userInfo}>
               <strong>Thiago Kraetzer</strong>
               <time
-                title='11 de julho as 08:30'
-                dateTime='2022-07-11 08:30:00'
+                title={publishedFormattedDate}
+                dateTime={publishedAt.toISOString()}
               >
-                Cerca de 1h atrás
+                Cerca de {publishedDateRelativeToNow}
               </time>
             </div>
 
             <button type='button' title='Delete comment'>
-              <Trash size={24} />
+              <Trash size={24} onClick={onDelete && onDelete} />
             </button>
 
           </header>
-
-          <p>Muito bom Devon, parabéns!! 👏👏</p>
+          {getCommentContent()}
         </div>
 
         <footer>
